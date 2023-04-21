@@ -1,4 +1,4 @@
-# GPTalk
+# GPTalk [WIP]
 
 GPTalk is a voice-activated AI assistant powered by OpenAI's ChatGPT, featuring speech recognition and text-to-speech. The project turns your device into a smart speaker that listens for a wake word, responds to voice commands, and reads the generated text aloud.
 
