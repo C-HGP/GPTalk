@@ -1,7 +1,8 @@
 import openai
 import speech_recognition as sr
 import pyttsx3
-import snowboydecoder
+from pvporcupine import Porcupine
+import pyaudio
 
 # Replace with your OpenAI API key
 openai.api_key = "your_openai_api_key"
@@ -39,38 +40,59 @@ def chat_with_gpt(prompt):
 
     return response.choices[0].text.strip()
 
-def detected_callback():
-    print("Wake word detected!")
-    snowboydecoder.play_audio_file(snowboydecoder.DETECT_DING)
-    user_input = recognize_speech()
-
-    if user_input is None:
-        return
-
-    print("You said:", user_input)
-    if user_input.lower() in ["exit", "stop", "quit"]:
-        speak("Goodbye!")
-        detector.terminate()
-
-    gpt_response = chat_with_gpt(user_input)
-    print("ChatGPT:", gpt_response)
-    speak(gpt_response)
-
 def main():
-    global detector
     speak("Welcome to your ChatGPT Smart Speaker! I will listen for my wake word.")
 
-    # Change the path to your desired wake word model file (e.g., 'alexa.umdl')
-    model = "model/jarvis.umdl"
+    porcupine = None
+    pa = None
+    audio_stream = None
 
-    # Sensitivity controls how sensitive the wake word detection should be
-    sensitivity = [0.5]
+    try:
+        porcupine = Porcupine(keyword_paths=["model/Jarvis_en_windows_v2_2_0.ppn"])
+        pa = pyaudio.PyAudio()
 
-    detector = snowboydecoder.HotwordDetector(model, sensitivity=sensitivity)
-    print("Listening for wake word...")
+        audio_stream = pa.open(
+            rate=porcupine.sample_rate,
+            channels=1,
+            format=pyaudio.paInt16,
+            input=True,
+            frames_per_buffer=porcupine.frame_length,
+            input_device_index=None,
+        )
 
-    # Main loop
-    detector.start(detected_callback=detected_callback, sleep_time=0.03)
+        print("Listening for wake word...")
+
+        while True:
+            pcm = audio_stream.read(porcupine.frame_length)
+            pcm = [int(x) for x in pcm]
+
+            keyword_index = porcupine.process(pcm)
+
+            if keyword_index >= 0:
+                print("Wake word detected!")
+                user_input = recognize_speech()
+
+                if user_input is None:
+                    continue
+
+                print("You said:", user_input)
+                if user_input.lower() in ["exit", "stop", "quit"]:
+                    speak("Goodbye!")
+                    break
+
+                gpt_response = chat_with_gpt(user_input)
+                print("ChatGPT:", gpt_response)
+                speak(gpt_response)
+
+    finally:
+        if audio_stream is not None:
+            audio_stream.close()
+
+        if pa is not None:
+            pa.terminate()
+
+        if porcupine is not None:
+            porcupine.delete()
 
 if __name__ == "__main__":
     main()
