@@ -1,6 +1,11 @@
-# GPTalk [WIP]
+# GPTalk
 
-GPTalk is a voice-activated AI assistant powered by OpenAI's ChatGPT, featuring speech recognition and text-to-speech. The project turns your device into a smart speaker that listens for a wake word, responds to voice commands, and reads the generated text aloud.
+GPTalk is a smart speaker powered by OpenAI's ChatGPT and Picovoice's Porcupine wake word engine. The application listens for a wake word, processes your speech using speech-to-text, generates a response with ChatGPT, and speaks the response using text-to-speech.
+
+## Requirements
+
+- Python 3.6 or higher
+- PyAudio
 
 ## Installation
 
@@ -16,17 +21,21 @@ git clone https://github.com/yourusername/GPTalk.git
 cd GPTalk
 ```
 
-3. Install the necessary packages:
+3. Install the dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Install PyAudio using the following command:
-
 ```bash
 python -m pip install pyaudio
 ```
+
+4. Download the Porcupine library and model files for your platform from the <a href=https://github.com/Picovoice/porcupine#getting-started>Porcupine GitHub repository</a>. The library file has the extension .dll for Windows, .dylib for macOS, and .so for Linux. The model file has the extension .pv. Update the smart_speaker.py script with the correct paths to the downloaded library and model files.
+
+5. Obtain a Porcupine access key from Picovoice Console. The application will prompt you to enter the access key on the initial launch.
+
+6. Obtain an OpenAI API key from the OpenAI website. The application will prompt you to enter the API key on the initial launch.
 
 ## Setting up Porcupine
 
@@ -43,25 +52,19 @@ Update the `smart_speaker.py` script to use your custom wake word:
 
 1. Replace the following line:
 
-```python
-porcupine = Porcupine(keyword_paths=["path/to/your/custom_wake_word.ppn"])
-```
-
 Make sure to replace `"path/to/your/custom_wake_word.ppn"` with the actual path to the downloaded `.ppn` file.
 
 ## Usage
 
-1. Obtain an API key from the [OpenAI website](https://beta.openai.com/signup/) and replace `your_openai_api_key` in `smart_speaker.py` with your key.
-
-2. Run the main script:
+1. Run the main script:
 
 ```bash
 python smart_speaker.py
 ```
 
-3. Speak the wake word and wait for the confirmation sound. Then, ask a question or give a command.
+2. Speak the wake word and wait for the confirmation sound. Then, ask a question or give a command.
 
-4. To stop the application, say "exit", "stop", or "quit".
+3. To stop the application, say Goodbye.
 
 ## Note
 
